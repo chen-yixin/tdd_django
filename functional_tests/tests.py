@@ -1,8 +1,11 @@
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import WebDriverException
 import time
 
+
+MAX_WAIT = 10
 
 class NewVistorTest(LiveServerTestCase):
 
@@ -13,9 +16,17 @@ class NewVistorTest(LiveServerTestCase):
         self.browser.quit()
 
     def check_for_row_in_list_table(self, row_text):
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn(row_text, [row.text for row in rows])
+        start_time = time.time()
+        while True:
+            try:
+                table = self.browser.find_element_by_id('id_list_table')
+                rows = table.find_elements_by_tag_name('tr')
+                self.assertIn(row_text, [row.text for row in rows])
+                return
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         # Edith听说有个很酷的在线代办事项应用
@@ -41,7 +52,6 @@ class NewVistorTest(LiveServerTestCase):
         # 她安回车键后,页面更新了
         # 代办事项中显示了"1: Buy peacock feathers"
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
         self.check_for_row_in_list_table('1: Buy peacock feathers')
 
         # 页面中又出现了一个文本框,可以输入其他的待办事项
@@ -50,7 +60,6 @@ class NewVistorTest(LiveServerTestCase):
         inputbox = self.browser.find_element_by_id('id_new_item')
         inputbox.send_keys('Use peacock feathers to make a fly')
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
 
         # 页面再次更新,她的清单中显示了这两个待办事项
         self.check_for_row_in_list_table('1: Buy peacock feathers')
@@ -64,7 +73,3 @@ class NewVistorTest(LiveServerTestCase):
         # 她访问那个URL,发现她的代办事项列表还在
 
         # 她很满意,去睡觉了
-
-
-if __name__ == "__main__":
-    unittest.main(warnings='ignore')
