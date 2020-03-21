@@ -15,7 +15,7 @@ class NewVistorTest(LiveServerTestCase):
     def tearDown(self):
         self.browser.quit()
 
-    def check_for_row_in_list_table(self, row_text):
+    def wait_for_row_in_list_table(self, row_text):
         start_time = time.time()
         while True:
             try:
@@ -52,7 +52,7 @@ class NewVistorTest(LiveServerTestCase):
         # 她安回车键后,页面更新了
         # 代办事项中显示了"1: Buy peacock feathers"
         inputbox.send_keys(Keys.ENTER)
-        self.check_for_row_in_list_table('1: Buy peacock feathers')
+        self.wait_for_row_in_list_table('1: Buy peacock feathers')
 
         # 页面中又出现了一个文本框,可以输入其他的待办事项
         # 她输入了"Use peacock feathers to make a fly" (使用孔雀羽毛做假蝇)
@@ -62,14 +62,60 @@ class NewVistorTest(LiveServerTestCase):
         inputbox.send_keys(Keys.ENTER)
 
         # 页面再次更新,她的清单中显示了这两个待办事项
-        self.check_for_row_in_list_table('1: Buy peacock feathers')
-        self.check_for_row_in_list_table('2: Use peacock feathers to make a fly')
+        self.wait_for_row_in_list_table('1: Buy peacock feathers')
+        self.wait_for_row_in_list_table('2: Use peacock feathers to make a fly')
+
+        # 她很满意,去睡觉了
 
         # Edith想知道这个网站是否会记住她的清单
         # 她看到网站为她生成了一个唯一的URL
         # 而且页面中有一些文字解说这个功能
-        self.fail('Finish the tests!')
 
         # 她访问那个URL,发现她的代办事项列表还在
 
-        # 她很满意,去睡觉了
+        
+
+    def test_multiple_users_can_start_lists_at_different_urls(self):
+        # Edith新建一个代办事项清单
+        self.browser.get(self.live_server_url)
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy peacock feathers')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: Buy peacock feathers')
+
+        # 她注意到清单有个唯一的URL
+        edith_list_url = self.browser.current_url
+        self.assertRegex(edith_list_url, '/lists/.+')
+
+        # 现在有个叫做Francis的新用户访问了网站
+
+        # 我们使用一个新浏览器会话
+        # 确保Edith的信息不会从cookie中泄露出去
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+
+        # Francis访问首页
+        # 首页看不到Edith的清单
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertNotIn('make a fly', page_text)
+        
+        # Francis输入一个新的待办事项,新建一个新的清单
+        # 他不像Edith那样兴趣盎然
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy milk')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: Buy milk')
+
+        # Francis获得了他的唯一URL
+        francis_list_url = self.browser.current_url
+        self.assertRegex(francis_list_url, '/lists/.+')
+        self.assertNotEqual(francis_list_url, edith_list_url)
+
+        # 这个页面中还是没有Edith的清单
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertIn('Buy milk', page_text)
+
+        # 两人都很满意,然后去睡觉了
