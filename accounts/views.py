@@ -16,7 +16,7 @@ def send_login_email(request):
     send_mail(
         'Your login link for Superlists',
         message_body,
-        os.environ.get('EMAIL_USER'),
+        os.environ.get('EMAIL_USER', 'noreply@superlists'),
         [email]
     )
     messages.success(
@@ -30,4 +30,9 @@ def login(request):
     user = auth.authenticate(request.GET.get('token'))
     if user:
         auth.login(request, user)
+    return redirect('/')
+
+
+def logout(request):
+    auth.logout(request)
     return redirect('/')
