@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'lists',
     'accounts',
+    'functional_tests',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,20 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handles': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHander',
+        }
+    },
+    'loggers': {
+        'django': {
+            'handers': ['console'],
+        }
+    }
+}

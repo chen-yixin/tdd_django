@@ -15,6 +15,10 @@ class LoginTest(FunctionalTest):
         # 第一次注意到导航栏有"登录"区域
         # 看到要求输入电子邮件地址,她随便输入了
 
+        if self.staging_server:
+            # 部署环境下不测试
+            return
+
         self.browser.get(self.live_server_url)
         self.browser.find_element_by_name('email').send_keys(TEST_EMAIL)
         self.browser.find_element_by_name('email').send_keys(Keys.ENTER)
