@@ -135,18 +135,18 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handles': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHander',
-        }
-    },
-    'loggers': {
-        'django': {
-            'handers': ['console'],
-        }
-    }
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handles': {
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHander',
+#         }
+#     },
+#     'loggers': {
+#         'django': {
+#             'handers': ['console'],
+#         }
+#     }
+# }

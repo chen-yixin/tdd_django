@@ -34,9 +34,7 @@ class NewVistorTest(FunctionalTest):
         # 页面中又出现了一个文本框,可以输入其他的待办事项
         # 她输入了"Use peacock feathers to make a fly" (使用孔雀羽毛做假蝇)
         # Edith做事很有条理
-        inputbox = self.get_item_input_box()
-        inputbox.send_keys('Use peacock feathers to make a fly')
-        inputbox.send_keys(Keys.ENTER)
+        self.add_list_item('Use peacock feathers to make a fly')
 
         # 页面再次更新,她的清单中显示了这两个待办事项
         self.wait_for_row_in_list_table('1: Buy peacock feathers')
@@ -53,10 +51,7 @@ class NewVistorTest(FunctionalTest):
     def test_multiple_users_can_start_lists_at_different_urls(self):
         # Edith新建一个代办事项清单
         self.browser.get(self.live_server_url)
-        inputbox = self.get_item_input_box()
-        inputbox.send_keys('Buy peacock feathers')
-        inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1: Buy peacock feathers')
+        self.add_list_item('Buy peacock feathers')
 
         # 她注意到清单有个唯一的URL
         edith_list_url = self.browser.current_url
@@ -78,10 +73,7 @@ class NewVistorTest(FunctionalTest):
         
         # Francis输入一个新的待办事项,新建一个新的清单
         # 他不像Edith那样兴趣盎然
-        inputbox = self.get_item_input_box()
-        inputbox.send_keys('Buy milk')
-        inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1: Buy milk')
+        self.add_list_item('Buy milk')
 
         # Francis获得了他的唯一URL
         francis_list_url = self.browser.current_url
